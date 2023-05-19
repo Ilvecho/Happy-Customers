@@ -1,0 +1,13 @@
+The problem is a classification problem:
+classify the attributes (X1, ..., X6) as Positive (1) or Negative (0) reviews
+
+The architecture that can be use for classification problems is a Perceptron. 
+Given the small size of the attributes space and of the dataset, I opt for a Single Layer Perceptron. 
+
+I could build the network as a single node, with Sigmoid activation function (0<=output<=1) and then approximate the output to the closest integer.
+However, I think it's better to design the network with two nodes, and interpret the output of each node as the probability of Positive or Negative review.
+
+Practically speaking, the network architecture will be:
+- One dense linear layer, that takes the 6 inputs (attributes) and generates 2 outputs
+- A Sigmoid activation function on the two outputs to introduce the non-linearity 
+- A final softmax to transform the outputs in a probability distribution 
