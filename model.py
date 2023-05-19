@@ -4,27 +4,24 @@ from torch import nn
 
 # Some Global parameters
 N_ATTRIBUTES = 6        # This could be extracted from the data shape, but for simplicity I just declare it here
-N_OUTPUTS = 2
-learning_rate = 1e-3    # Standard value for a learning rate
+N_OUTPUTS = 1
+learning_rate = 0.1    # Standard value for a learning rate
 N_EPOCHS = 10000
 
 # Auxiliary class to manipluate the dataset. Once again, it's not necessary in this case, but makes the code easily scalable
 def DataLoader(file_name, split: float):
 
     data = pd.read_csv(file_name)
-    attributes = torch.tensor(data.drop('Y', axis=1).values)
 
-    # for the labels, we need a bit of work to transform them in 1 hot encoding
-    labels = torch.zeros(data.shape[0], 2)
-    for i in range(data.shape[0]):
-      labels[i].scatter_(dim=0, index=torch.tensor(data['Y'].values[i]), value=1)
+    attributes = torch.tensor(data.drop('Y', axis=1).values).float()
+    labels = torch.tensor(data['Y'].values).unsqueeze_(1)
 
     # split the dataset in training and validation
-    train_attributes = attributes[:int(attributes.shape[0]*split)]
-    val_attributes = attributes[int(attributes.shape[0]*split):]
+    train_attributes = attributes[:int(attributes.shape[0]*split)].float()
+    val_attributes = attributes[int(attributes.shape[0]*split):].float()
 
-    train_labels = labels[:int(attributes.shape[0]*split)]
-    val_labels = labels[int(attributes.shape[0]*split):]
+    train_labels = labels[:int(attributes.shape[0]*split)].float()
+    val_labels = labels[int(attributes.shape[0]*split):].float()
     
     return train_attributes, val_attributes, train_labels, val_labels
 
@@ -36,8 +33,7 @@ class SingleLayerPerceptron(nn.Module):
     super().__init__()
     self.stack = nn.Sequential(
         nn.Linear(N_ATTRIBUTES, N_OUTPUTS),
-        nn.Sigmoid(),
-        nn.Softmax(dim=1)
+        nn.Sigmoid()
     )
   
   def forward(self, x):
